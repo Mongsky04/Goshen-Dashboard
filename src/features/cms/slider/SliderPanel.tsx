@@ -1,18 +1,17 @@
 import { useState, useMemo } from 'react'
 import { PageShell } from '@/components/layout/PageShell'
-import { useSlider, useCreateSlider, useDeleteSlider, useReorderSlider } from './useSlider'
+import { useSlider, useCreateSlider, useDeleteSlider } from './useSlider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-import { Trash2, Plus, ImageIcon, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { Trash2, Plus, ImageIcon, Search } from 'lucide-react'
 
 export function SliderPanel() {
   const { data: rawItems = [], isLoading } = useSlider()
   const create = useCreateSlider()
   const remove = useDeleteSlider()
-  const reorder = useReorderSlider()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
 
@@ -27,21 +26,6 @@ export function SliderPanel() {
     if (!confirm('Delete this slide?')) return
     try { await remove.mutateAsync(id); toast.success('Slide deleted') }
     catch { toast.error('Failed to delete') }
-  }
-
-  const handleMove = async (index: number, direction: 'left' | 'right') => {
-    const swapIndex = direction === 'left' ? index - 1 : index + 1
-    if (swapIndex < 0 || swapIndex >= items.length) return
-
-    const a = items[index]
-    const b = items[swapIndex]
-    try {
-      // Swap their order_num values
-      await reorder.mutateAsync({ id: a.id, orderNum: b.order_num })
-      await reorder.mutateAsync({ id: b.id, orderNum: a.order_num })
-    } catch {
-      toast.error('Failed to reorder')
-    }
   }
 
   return (
@@ -87,97 +71,74 @@ export function SliderPanel() {
       }
     >
       <div className="space-y-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search by name…"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          className="pl-9"
-        />
-      </div>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by name…"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="aspect-video animate-pulse rounded-xl bg-muted" />
-          ))}
-        </div>
-      ) : items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed bg-card py-16 text-center">
-          <ImageIcon className="mb-3 h-10 w-10 text-muted-foreground/40" />
-          <p className="text-sm font-medium text-muted-foreground">No slides yet</p>
-          <p className="mt-1 text-xs text-muted-foreground">Click "Add Slide" to get started.</p>
-        </div>
-      ) : (
-        <>
-          {items.length > 1 && !query && (
-            <p className="text-xs text-muted-foreground">
-              Use the ← → buttons on each slide to change the display order.
-            </p>
-          )}
-          {filtered.length === 0 ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">No banners match "{query}"</p>
-          ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            {filtered.map((s) => {
-              const realIndex = items.findIndex(x => x.id === s.id)
-              return (
-              <div key={s.id} className="group overflow-hidden rounded-xl border bg-card shadow-sm">
-                {s.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={s.image_url}
-                    alt={s.title || `Slide ${realIndex + 1}`}
-                    className="aspect-video w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex aspect-video items-center justify-center bg-muted">
-                    <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
-                  </div>
-                )}
-                {s.title && (
-                  <div className="px-2 pt-1.5">
-                    <p className="truncate text-xs font-medium">{s.title}</p>
-                  </div>
-                )}
-                <div className="flex items-center justify-between border-t px-2 py-1.5">
-                  <div className="flex items-center gap-0.5">
-                    <button
-                      onClick={() => handleMove(realIndex, 'left')}
-                      disabled={realIndex === 0 || reorder.isPending}
-                      className="rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30"
-                      title="Move left"
-                    >
-                      <ChevronLeft className="h-3.5 w-3.5" />
-                    </button>
-                    <span className="min-w-[1.5rem] text-center text-xs text-muted-foreground">
-                      {realIndex + 1}
-                    </span>
-                    <button
-                      onClick={() => handleMove(realIndex, 'right')}
-                      disabled={realIndex === items.length - 1 || reorder.isPending}
-                      className="rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30"
-                      title="Move right"
-                    >
-                      <ChevronRight className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                  {/* Delete */}
-                  <button
-                    onClick={() => handleDelete(s.id)}
-                    className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-              )
-            })}
+        {isLoading ? (
+          <div className="space-y-2">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-14 animate-pulse rounded-lg bg-muted" />
+            ))}
           </div>
-          )}
-        </>
-      )}
+        ) : items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed bg-card py-16 text-center">
+            <ImageIcon className="mb-3 h-10 w-10 text-muted-foreground/40" />
+            <p className="text-sm font-medium text-muted-foreground">No slides yet</p>
+            <p className="mt-1 text-xs text-muted-foreground">Click "Add Slide" to get started.</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">No banners match "{query}"</p>
+        ) : (
+          <div className="rounded-xl border bg-card overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/40">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-16">#</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-20">Image</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground">Name</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-muted-foreground w-16"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((s, i) => (
+                  <tr key={s.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
+                    <td className="px-4 py-3 text-muted-foreground">{i + 1}</td>
+                    <td className="px-4 py-3">
+                      {s.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={s.image_url}
+                          alt={s.title}
+                          className="h-10 w-16 rounded-md object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-16 items-center justify-center rounded-md bg-muted">
+                          <ImageIcon className="h-4 w-4 text-muted-foreground/40" />
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 font-medium text-foreground">{s.title || '—'}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => handleDelete(s.id)}
+                        className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </PageShell>
   )
