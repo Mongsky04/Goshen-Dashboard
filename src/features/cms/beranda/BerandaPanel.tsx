@@ -19,7 +19,7 @@ export function BerandaPanel() {
   const [tab, setTab] = useState<Tab>('banner')
 
   return (
-    <PageShell title="Homepage">
+    <PageShell>
       <div className="space-y-6">
       <div className="flex border-b">
         {TABS.map((t) => (
