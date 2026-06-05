@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
-import { Package, MonitorPlay, Mic2, LogOut, Home, LayoutGrid, Image } from 'lucide-react'
+import { Package, MonitorPlay, Mic2, Home, LayoutGrid, Image } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const CATALOG_ITEMS = [
@@ -78,10 +78,13 @@ export function Sidebar() {
       <div className="border-t p-2">
         <button
           onClick={() => { logout(); navigate('/login', { replace: true }) }}
-          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 hover:bg-muted transition-colors"
         >
-          <LogOut className="h-4 w-4" />
-          Logout
+          <div className="h-[26px] w-[26px] shrink-0 rounded-full bg-muted border border-border" />
+          <div className="min-w-0 text-left">
+            <p className="text-[12px] font-medium text-foreground leading-tight">Admin</p>
+            <p className="text-[10px] text-muted-foreground leading-tight">Logout</p>
+          </div>
         </button>
       </div>
     </aside>

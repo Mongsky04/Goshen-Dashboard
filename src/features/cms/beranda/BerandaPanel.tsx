@@ -4,6 +4,7 @@ import { HomepagePanel } from '@/features/cms/homepage/HomepagePanel'
 import { FeaturedPanel } from '@/features/cms/featured/FeaturedPanel'
 import { ArticlesPanel } from '@/features/cms/articles/ArticlesPanel'
 import { cn } from '@/lib/utils'
+import { PageShell } from '@/components/layout/PageShell'
 
 const TABS = [
   { id: 'banner',   label: 'Banner' },
@@ -18,7 +19,8 @@ export function BerandaPanel() {
   const [tab, setTab] = useState<Tab>('banner')
 
   return (
-    <div className="space-y-6">
+    <PageShell title="Homepage">
+      <div className="space-y-6">
       <div className="flex border-b">
         {TABS.map((t) => (
           <button
@@ -40,6 +42,7 @@ export function BerandaPanel() {
       {tab === 'grid'     && <HomepagePanel />}
       {tab === 'featured' && <FeaturedPanel />}
       {tab === 'artikel'  && <ArticlesPanel />}
-    </div>
+      </div>
+    </PageShell>
   )
 }

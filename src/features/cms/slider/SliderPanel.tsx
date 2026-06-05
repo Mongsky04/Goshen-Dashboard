@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { PageShell } from '@/components/layout/PageShell'
 import { useSlider, useCreateSlider, useDeleteSlider, useReorderSlider } from './useSlider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -44,14 +45,10 @@ export function SliderPanel() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Banner</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            Manage banner slide images.
-          </p>
-        </div>
+    <PageShell
+      title="Banner"
+      subtitle="Manage banner slide images."
+      action={
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button size="sm"><Plus className="mr-1 h-4 w-4" />Add Slide</Button>
@@ -62,7 +59,6 @@ export function SliderPanel() {
               onSubmit={async (e) => {
                 e.preventDefault()
                 const fd = new FormData(e.currentTarget)
-                // Auto-assign as last position
                 fd.set('order_num', String(items.length))
                 try {
                   await create.mutateAsync(fd)
@@ -88,8 +84,9 @@ export function SliderPanel() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
-
+      }
+    >
+      <div className="space-y-4">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
@@ -181,6 +178,7 @@ export function SliderPanel() {
           )}
         </>
       )}
-    </div>
+      </div>
+    </PageShell>
   )
 }

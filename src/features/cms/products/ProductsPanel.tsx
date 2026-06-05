@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { PageShell } from '@/components/layout/PageShell'
 import { useProducts, useCreateProduct, useDeleteProduct } from './useProducts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -46,14 +47,10 @@ export function ProductsPanel() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Product Catalog</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            Manage all products available on the site.
-          </p>
-        </div>
+    <PageShell
+      title="Product Catalog"
+      subtitle="Manage all products available on the site."
+      action={
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button size="sm"><Plus className="mr-1 h-4 w-4" />Add Product</Button>
@@ -83,8 +80,9 @@ export function ProductsPanel() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
-
+      }
+    >
+      <div className="space-y-4">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
@@ -148,6 +146,7 @@ export function ProductsPanel() {
           </Table>
         </div>
       )}
-    </div>
+      </div>
+    </PageShell>
   )
 }

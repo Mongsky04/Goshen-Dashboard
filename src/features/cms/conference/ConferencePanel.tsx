@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { MediaPickerDialog } from '@/components/MediaPickerDialog'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { PageShell } from '@/components/layout/PageShell'
 
 const SLUGS = [
   { slug: 'enterprise',       label: 'Enterprise' },
@@ -62,20 +63,16 @@ export function ConferencePanel() {
   const activeLabel = SLUGS.find((s) => s.slug === activeSlug)?.label ?? ''
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Conference</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            Edit conference page content per segment.
-          </p>
-        </div>
+    <PageShell
+      title="Conference"
+      subtitle="Edit conference page content per segment."
+      action={
         <Button size="sm" onClick={handleSave} disabled={save.isPending || isLoading}>
           {save.isPending ? 'Saving…' : 'Save'}
         </Button>
-      </div>
-
+      }
+    >
+      <div className="space-y-6">
       {/* Slug tabs */}
       <div className="flex border-b">
         {SLUGS.map(({ slug, label }) => (
@@ -199,6 +196,7 @@ export function ConferencePanel() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </PageShell>
   )
 }

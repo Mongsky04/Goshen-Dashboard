@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { PageShell } from '@/components/layout/PageShell'
 import { useSlider } from '../slider/useSlider'
 import { useProducts } from '../products/useProducts'
 import { useFeatured } from '../featured/useFeatured'
@@ -59,13 +60,8 @@ export function OverviewPanel() {
   const loading = l1 || l2 || l3 || l4
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-        <p className="mt-0.5 text-sm text-muted-foreground">
-          Welcome — manage your Goshen site content from here.
-        </p>
-      </div>
+    <PageShell title="Dashboard" subtitle="Welcome — manage your Goshen site content from here.">
+      <div className="space-y-8">
 
       <section>
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -111,6 +107,7 @@ export function OverviewPanel() {
           <QuickLink to="/performer"  icon={Mic2}        title="Performer"       desc="Performer page content" />
         </div>
       </section>
-    </div>
+      </div>
+    </PageShell>
   )
 }
