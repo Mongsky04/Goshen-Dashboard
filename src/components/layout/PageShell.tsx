@@ -7,23 +7,19 @@ interface PageShellProps {
 
 export function PageShell({ title, subtitle, action, children }: PageShellProps) {
   return (
-    <>
-      <div className="flex h-14 shrink-0 items-center border-b bg-card px-10">
-        <div className="mx-auto max-w-6xl flex w-full items-center justify-between">
+    <div className="px-8 py-6">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-5 flex items-start justify-between">
           <div>
-            <h1 className="text-[15px] font-bold text-foreground leading-snug">{title}</h1>
+            <h1 className="text-lg font-bold text-foreground">{title}</h1>
             {subtitle && (
-              <p className="mt-px text-[12px] text-muted-foreground">{subtitle}</p>
+              <p className="mt-0.5 text-[13px] text-muted-foreground">{subtitle}</p>
             )}
           </div>
           {action}
         </div>
+        {children}
       </div>
-      <div className="px-10 py-5">
-        <div className="mx-auto max-w-6xl">
-          {children}
-        </div>
-      </div>
-    </>
+    </div>
   )
 }
