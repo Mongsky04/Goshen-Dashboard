@@ -96,7 +96,7 @@ export function OverviewPanel() {
           Homepage Content
         </h2>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <QuickLink to="/banner"   icon={Image}      title="Hero Banner"       desc="Add or remove banner slides" />
+          <QuickLink to="/banner"   icon={Image}      title="Banner"            desc="Manage banner slide images" />
           <QuickLink to="/beranda"  icon={LayoutGrid}  title="Homepage"          desc="Product grid, featured & articles" />
           <QuickLink to="/products" icon={Package}     title="Products"          desc="Manage the product catalog" />
           <QuickLink to="/conference" icon={MonitorPlay} title="Conference"      desc="Conference page content" />

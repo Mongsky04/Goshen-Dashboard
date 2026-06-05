@@ -42,9 +42,9 @@ export function SliderPanel() {
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Hero Banner</h1>
+          <h1 className="text-xl font-semibold">Banner</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            Images shown at the top of the homepage.
+            Manage banner slide images.
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
