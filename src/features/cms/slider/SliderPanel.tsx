@@ -70,6 +70,10 @@ export function SliderPanel() {
               className="space-y-4"
             >
               <div className="space-y-1.5">
+                <Label>Name</Label>
+                <Input name="title" placeholder="e.g. Summer Campaign" required />
+              </div>
+              <div className="space-y-1.5">
                 <Label>Image</Label>
                 <Input name="image" type="file" accept="image/*" required />
               </div>

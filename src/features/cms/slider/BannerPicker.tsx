@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useAllBanners, usePageBanners, useReplacePageBanners } from './usePageBanners'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { Check, ImageIcon } from 'lucide-react'
+import { Check, ImageIcon, Search } from 'lucide-react'
 
 interface Props {
   slug: string
@@ -16,6 +17,7 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
   const { data: current = [], isLoading: currentLoading } = usePageBanners(slug)
   const replace = useReplacePageBanners(slug)
   const [selected, setSelected] = useState<number[]>([])
+  const [query, setQuery] = useState('')
 
   useEffect(() => {
     setSelected(current.map(b => b.id))
@@ -40,10 +42,14 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
 
   const isLoading = allLoading || currentLoading
 
-  const { selectedBanners, unselectedBanners } = useMemo(() => ({
-    selectedBanners: all.filter(b => selected.includes(b.id)),
-    unselectedBanners: all.filter(b => !selected.includes(b.id)),
-  }), [all, selected])
+  const { selectedBanners, unselectedBanners } = useMemo(() => {
+    const q = query.toLowerCase()
+    const matches = (b: typeof all[0]) => !q || b.title.toLowerCase().includes(q)
+    return {
+      selectedBanners: all.filter(b => selected.includes(b.id) && matches(b)),
+      unselectedBanners: all.filter(b => !selected.includes(b.id) && matches(b)),
+    }
+  }, [all, selected, query])
 
   const BannerCard = ({ b, index }: { b: typeof all[0]; index?: number }) => {
     const isSelected = selected.includes(b.id)
@@ -57,10 +63,15 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
       >
         {b.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={b.image_url} alt={`Banner ${b.id}`} className="aspect-video w-full object-cover" />
+          <img src={b.image_url} alt={b.title || `Banner ${b.id}`} className="aspect-video w-full object-cover" />
         ) : (
           <div className="flex aspect-video items-center justify-center bg-muted">
             <ImageIcon className="h-6 w-6 text-muted-foreground/40" />
+          </div>
+        )}
+        {b.title && (
+          <div className="px-2 py-1.5">
+            <p className="truncate text-xs font-medium">{b.title}</p>
           </div>
         )}
         {isSelected && (
@@ -98,6 +109,16 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
         </p>
       ) : (
         <div className="space-y-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+
           {isLoading ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {[...Array(4)].map((_, i) => (
@@ -123,6 +144,9 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
                     {unselectedBanners.map((b) => <BannerCard key={b.id} b={b} />)}
                   </div>
                 </div>
+              )}
+              {selectedBanners.length === 0 && unselectedBanners.length === 0 && (
+                <p className="py-8 text-center text-sm text-muted-foreground">No banners match "{query}"</p>
               )}
             </>
           )}
