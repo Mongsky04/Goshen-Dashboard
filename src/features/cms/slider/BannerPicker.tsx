@@ -1,0 +1,99 @@
+import { useState, useEffect } from 'react'
+import { useAllBanners, usePageBanners, useReplacePageBanners } from './usePageBanners'
+import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import { Check, ImageIcon } from 'lucide-react'
+
+interface Props {
+  slug: string
+  multiple?: boolean
+  title?: string
+  description?: string
+}
+
+export function BannerPicker({ slug, multiple = true, title = 'Banners', description }: Props) {
+  const { data: all = [], isLoading: allLoading } = useAllBanners()
+  const { data: current = [], isLoading: currentLoading } = usePageBanners(slug)
+  const replace = useReplacePageBanners(slug)
+  const [selected, setSelected] = useState<number[]>([])
+
+  useEffect(() => {
+    setSelected(current.map(b => b.id))
+  }, [current])
+
+  const toggle = (id: number) => {
+    if (multiple) {
+      setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+    } else {
+      setSelected(prev => prev.includes(id) ? [] : [id])
+    }
+  }
+
+  const handleSave = async () => {
+    try {
+      await replace.mutateAsync(selected)
+      toast.success('Banner selection saved')
+    } catch {
+      toast.error('Failed to save')
+    }
+  }
+
+  const isLoading = allLoading || currentLoading
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-base font-semibold">{title}</h2>
+          {description && <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>}
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            {selected.length} selected
+          </span>
+          <Button size="sm" onClick={handleSave} disabled={replace.isPending}>
+            {replace.isPending ? 'Saving…' : 'Save'}
+          </Button>
+        </div>
+      </div>
+
+      {all.length === 0 && !isLoading ? (
+        <p className="text-sm text-muted-foreground">No banners in catalog yet. Add banners from the <strong>Banner</strong> catalog page first.</p>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {isLoading
+            ? [...Array(4)].map((_, i) => (
+                <div key={i} className="aspect-video animate-pulse rounded-xl bg-muted" />
+              ))
+            : all.map(b => {
+                const isSelected = selected.includes(b.id)
+                return (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => toggle(b.id)}
+                    className={`relative overflow-hidden rounded-xl border text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                      isSelected ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-muted-foreground'
+                    }`}
+                  >
+                    {b.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={b.image_url} alt={`Banner ${b.id}`} className="aspect-video w-full object-cover" />
+                    ) : (
+                      <div className="flex aspect-video items-center justify-center bg-muted">
+                        <ImageIcon className="h-6 w-6 text-muted-foreground/40" />
+                      </div>
+                    )}
+                    {isSelected && (
+                      <div className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary shadow">
+                        <Check className="h-3 w-3 text-white" />
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
+        </div>
+      )}
+    </div>
+  )
+}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SliderPanel } from '@/features/cms/slider/SliderPanel'
+import { BannerPicker } from '@/features/cms/slider/BannerPicker'
 import { HomepagePanel } from '@/features/cms/homepage/HomepagePanel'
 import { FeaturedPanel } from '@/features/cms/featured/FeaturedPanel'
 import { ArticlesPanel } from '@/features/cms/articles/ArticlesPanel'
@@ -36,7 +36,7 @@ export function BerandaPanel() {
         ))}
       </div>
 
-      {tab === 'banner'   && <SliderPanel />}
+      {tab === 'banner'   && <BannerPicker slug="homepage" multiple={true} title="Homepage Banners" description="Select banners from the catalog to display on the homepage." />}
       {tab === 'grid'     && <HomepagePanel />}
       {tab === 'featured' && <FeaturedPanel />}
       {tab === 'artikel'  && <ArticlesPanel />}

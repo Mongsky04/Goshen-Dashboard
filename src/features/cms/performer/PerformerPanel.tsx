@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { usePerformerPage, useSavePerformerPage } from './usePerformer'
+import { BannerPicker } from '@/features/cms/slider/BannerPicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -185,6 +186,16 @@ export function PerformerPanel() {
               <Label>Video URL</Label>
               <Input value={form.mainVideoUrl} onChange={set('mainVideoUrl')} placeholder="https://youtube.com/…" />
             </div>
+          </div>
+
+          {/* Banner */}
+          <div className="rounded-xl border bg-card p-5">
+            <BannerPicker
+              slug={`performer-${activeSlug}`}
+              multiple={false}
+              title="Page Banner"
+              description="Select 1 banner from the catalog to display on this page."
+            />
           </div>
         </div>
       )}

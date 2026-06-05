@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useConferencePage, useSaveConferencePage } from './useConference'
+import { BannerPicker } from '@/features/cms/slider/BannerPicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -185,6 +186,16 @@ export function ConferencePanel() {
               <Label>Description</Label>
               <Input value={form.workspaceDescription} onChange={set('workspaceDescription')} />
             </div>
+          </div>
+
+          {/* Banner */}
+          <div className="rounded-xl border bg-card p-5">
+            <BannerPicker
+              slug={`conference-${activeSlug}`}
+              multiple={false}
+              title="Page Banner"
+              description="Select 1 banner from the catalog to display on this page."
+            />
           </div>
         </div>
       )}
