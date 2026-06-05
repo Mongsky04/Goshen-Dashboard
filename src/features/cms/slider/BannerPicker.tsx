@@ -84,8 +84,8 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {[...Array(3)].map((_, i) => <div key={i} className="aspect-video animate-pulse rounded-xl bg-muted" />)}
+        <div className="space-y-2">
+          {[...Array(3)].map((_, i) => <div key={i} className="h-14 animate-pulse rounded-lg bg-muted" />)}
         </div>
       ) : selectedItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed bg-card py-10 text-center">
@@ -94,35 +94,43 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
           <p className="text-xs text-muted-foreground">Click Add to pick from catalog.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {selectedItems.map((b, i) => (
-            <div key={b.id} className="group relative overflow-hidden rounded-xl border border-primary ring-1 ring-primary">
-              {b.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={b.image_url} alt={b.title || `Banner ${i + 1}`} className="aspect-video w-full object-cover" />
-              ) : (
-                <div className="flex aspect-video items-center justify-center bg-muted">
-                  <ImageIcon className="h-6 w-6 text-muted-foreground/40" />
-                </div>
-              )}
-              {b.title && (
-                <div className="px-2 py-1.5">
-                  <p className="truncate text-xs font-medium">{b.title}</p>
-                </div>
-              )}
-              {multiple && (
-                <div className="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary shadow">
-                  <span className="text-[10px] font-bold text-white">{i + 1}</span>
-                </div>
-              )}
-              <button
-                onClick={() => handleRemove(b.id)}
-                className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive shadow opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <X className="h-3 w-3 text-white" />
-              </button>
-            </div>
-          ))}
+        <div className="rounded-xl border bg-card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/40">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-16">#</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-20">Image</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground">Name</th>
+                <th className="px-4 py-2.5 text-right text-xs font-semibold text-muted-foreground w-16"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedItems.map((b, i) => (
+                <tr key={b.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
+                  <td className="px-4 py-3 text-muted-foreground">{i + 1}</td>
+                  <td className="px-4 py-3">
+                    {b.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={b.image_url} alt={b.title || `Banner ${i + 1}`} className="h-10 w-16 rounded-md object-cover" />
+                    ) : (
+                      <div className="flex h-10 w-16 items-center justify-center rounded-md bg-muted">
+                        <ImageIcon className="h-4 w-4 text-muted-foreground/40" />
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-foreground">{b.title || '—'}</td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => handleRemove(b.id)}
+                      className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
