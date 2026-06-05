@@ -5,9 +5,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { toast } from 'sonner'
 import { Trash2, Plus, Search } from 'lucide-react'
+
+type SortKey = 'newest' | 'oldest' | 'az' | 'za' | 'cat'
+
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: 'newest', label: 'Terbaru' },
+  { value: 'oldest', label: 'Terlama' },
+  { value: 'az',     label: 'Nama A–Z' },
+  { value: 'za',     label: 'Nama Z–A' },
+  { value: 'cat',    label: 'Kategori A–Z' },
+]
 
 export function ProductsPanel() {
   const { data: products = [], isLoading } = useProducts()
@@ -15,15 +24,27 @@ export function ProductsPanel() {
   const remove = useDeleteProduct()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [sort, setSort] = useState<SortKey>('newest')
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase()
-    return products.filter(p =>
-      !q || p.name.toLowerCase().includes(q) ||
+    let result = products.filter(p =>
+      !q ||
+      p.name.toLowerCase().includes(q) ||
       p.category.toLowerCase().includes(q) ||
       p.sub_category.toLowerCase().includes(q)
     )
-  }, [products, query])
+
+    switch (sort) {
+      case 'newest': result = [...result].sort((a, b) => b.id - a.id); break
+      case 'oldest': result = [...result].sort((a, b) => a.id - b.id); break
+      case 'az':     result = [...result].sort((a, b) => a.name.localeCompare(b.name)); break
+      case 'za':     result = [...result].sort((a, b) => b.name.localeCompare(a.name)); break
+      case 'cat':    result = [...result].sort((a, b) => a.category.localeCompare(b.category)); break
+    }
+
+    return result
+  }, [products, query, sort])
 
   const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -38,12 +59,8 @@ export function ProductsPanel() {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Delete this product?')) return
-    try {
-      await remove.mutateAsync(id)
-      toast.success('Product deleted')
-    } catch {
-      toast.error('Failed to delete product')
-    }
+    try { await remove.mutateAsync(id); toast.success('Product deleted') }
+    catch { toast.error('Failed to delete product') }
   }
 
   return (
@@ -83,69 +100,91 @@ export function ProductsPanel() {
       }
     >
       <div className="space-y-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search by name, category, or sub category…"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          className="pl-9"
-        />
-      </div>
+        {/* Search + Sort */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name, category, or sub category…"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <select
+            value={sort}
+            onChange={e => setSort(e.target.value as SortKey)}
+            className="h-9 rounded-md border border-input bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+          >
+            {SORT_OPTIONS.map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
 
-      {isLoading ? (
-        <div className="space-y-2">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-12 animate-pulse rounded-xl bg-muted" />
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="w-12">ID</TableHead>
-                <TableHead className="w-16">Gambar</TableHead>
-                <TableHead>Nama</TableHead>
-                <TableHead>Kategori</TableHead>
-                <TableHead>Sub Kategori</TableHead>
-                <TableHead className="w-12"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-8 text-center text-sm text-muted-foreground">
-                    No products match "{query}"
-                  </TableCell>
-                </TableRow>
-              )}
-              {filtered.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell className="text-muted-foreground text-xs">{p.id}</TableCell>
-                  <TableCell>
-                    {p.image_url && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={p.image_url} alt={p.name} className="h-9 w-9 rounded-lg object-cover" />
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium">{p.name}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{p.category}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{p.sub_category}</TableCell>
-                  <TableCell>
-                    <button
-                      onClick={() => handleDelete(p.id)}
-                      className="rounded-lg p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+        {isLoading ? (
+          <div className="space-y-2">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-12 animate-pulse rounded-lg bg-muted" />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border bg-card overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm">
+                <tr className="border-b">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-12">ID</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground w-16">Gambar</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground">Nama</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground">Kategori</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground">Sub Kategori</th>
+                  <th className="px-4 py-2.5 w-12"></th>
+                </tr>
+              </thead>
+            </table>
+            <div className="max-h-[640px] overflow-y-auto">
+              <table className="w-full text-sm">
+                <tbody>
+                  {filtered.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-sm text-muted-foreground">
+                        No products match "{query}"
+                      </td>
+                    </tr>
+                  ) : filtered.map((p) => (
+                    <tr key={p.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
+                      <td className="px-4 py-3 text-xs text-muted-foreground w-12">{p.id}</td>
+                      <td className="px-4 py-3 w-16">
+                        {p.image_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={p.image_url} alt={p.name} className="h-9 w-9 rounded-lg object-cover" />
+                        ) : (
+                          <div className="h-9 w-9 rounded-lg bg-muted" />
+                        )}
+                      </td>
+                      <td className="px-4 py-3 font-medium text-foreground">{p.name}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{p.category}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{p.sub_category}</td>
+                      <td className="px-4 py-3 w-12">
+                        <button
+                          onClick={() => handleDelete(p.id)}
+                          className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {filtered.length > 10 && (
+              <div className="border-t px-4 py-2 text-xs text-muted-foreground">
+                Showing {filtered.length} items — scroll to see more
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </PageShell>
   )
