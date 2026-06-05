@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useAllBanners, usePageBanners, useReplacePageBanners } from './usePageBanners'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -40,6 +40,41 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
 
   const isLoading = allLoading || currentLoading
 
+  const { selectedBanners, unselectedBanners } = useMemo(() => ({
+    selectedBanners: all.filter(b => selected.includes(b.id)),
+    unselectedBanners: all.filter(b => !selected.includes(b.id)),
+  }), [all, selected])
+
+  const BannerCard = ({ b, index }: { b: typeof all[0]; index?: number }) => {
+    const isSelected = selected.includes(b.id)
+    return (
+      <button
+        type="button"
+        onClick={() => toggle(b.id)}
+        className={`relative overflow-hidden rounded-xl border text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+          isSelected ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-muted-foreground'
+        }`}
+      >
+        {b.image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={b.image_url} alt={`Banner ${b.id}`} className="aspect-video w-full object-cover" />
+        ) : (
+          <div className="flex aspect-video items-center justify-center bg-muted">
+            <ImageIcon className="h-6 w-6 text-muted-foreground/40" />
+          </div>
+        )}
+        {isSelected && (
+          <div className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary shadow">
+            {multiple && index !== undefined
+              ? <span className="text-[10px] font-bold text-white">{index + 1}</span>
+              : <Check className="h-3 w-3 text-white" />
+            }
+          </div>
+        )}
+      </button>
+    )
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-start justify-between">
@@ -58,40 +93,39 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
       </div>
 
       {all.length === 0 && !isLoading ? (
-        <p className="text-sm text-muted-foreground">No banners in catalog yet. Add banners from the <strong>Banner</strong> catalog page first.</p>
+        <p className="text-sm text-muted-foreground">
+          No banners in catalog yet. Add banners from the <strong>Banner</strong> catalog page first.
+        </p>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {isLoading
-            ? [...Array(4)].map((_, i) => (
+        <div className="space-y-4">
+          {isLoading ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {[...Array(4)].map((_, i) => (
                 <div key={i} className="aspect-video animate-pulse rounded-xl bg-muted" />
-              ))
-            : all.map(b => {
-                const isSelected = selected.includes(b.id)
-                return (
-                  <button
-                    key={b.id}
-                    type="button"
-                    onClick={() => toggle(b.id)}
-                    className={`relative overflow-hidden rounded-xl border text-left transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                      isSelected ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-muted-foreground'
-                    }`}
-                  >
-                    {b.image_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={b.image_url} alt={`Banner ${b.id}`} className="aspect-video w-full object-cover" />
-                    ) : (
-                      <div className="flex aspect-video items-center justify-center bg-muted">
-                        <ImageIcon className="h-6 w-6 text-muted-foreground/40" />
-                      </div>
-                    )}
-                    {isSelected && (
-                      <div className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary shadow">
-                        <Check className="h-3 w-3 text-white" />
-                      </div>
-                    )}
-                  </button>
-                )
-              })}
+              ))}
+            </div>
+          ) : (
+            <>
+              {selectedBanners.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Selected</p>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                    {selectedBanners.map((b, i) => <BannerCard key={b.id} b={b} index={i} />)}
+                  </div>
+                </div>
+              )}
+              {unselectedBanners.length > 0 && (
+                <div className="space-y-2">
+                  {selectedBanners.length > 0 && (
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">All Banners</p>
+                  )}
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                    {unselectedBanners.map((b) => <BannerCard key={b.id} b={b} />)}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>
