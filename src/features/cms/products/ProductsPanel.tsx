@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useProducts, useCreateProduct, useDeleteProduct } from './useProducts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -6,13 +6,23 @@ import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { toast } from 'sonner'
-import { Trash2, Plus } from 'lucide-react'
+import { Trash2, Plus, Search } from 'lucide-react'
 
 export function ProductsPanel() {
   const { data: products = [], isLoading } = useProducts()
   const create = useCreateProduct()
   const remove = useDeleteProduct()
   const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+
+  const filtered = useMemo(() => {
+    const q = query.toLowerCase()
+    return products.filter(p =>
+      !q || p.name.toLowerCase().includes(q) ||
+      p.category.toLowerCase().includes(q) ||
+      p.sub_category.toLowerCase().includes(q)
+    )
+  }, [products, query])
 
   const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -75,6 +85,16 @@ export function ProductsPanel() {
         </Dialog>
       </div>
 
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search by name, category, or sub category…"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+
       {isLoading ? (
         <div className="space-y-2">
           {[...Array(5)].map((_, i) => (
@@ -95,7 +115,14 @@ export function ProductsPanel() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((p) => (
+              {filtered.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="py-8 text-center text-sm text-muted-foreground">
+                    No products match "{query}"
+                  </TableCell>
+                </TableRow>
+              )}
+              {filtered.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="text-muted-foreground text-xs">{p.id}</TableCell>
                   <TableCell>

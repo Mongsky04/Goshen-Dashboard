@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useSlider, useCreateSlider, useDeleteSlider, useReorderSlider } from './useSlider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-import { Trash2, Plus, ImageIcon, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Trash2, Plus, ImageIcon, ChevronLeft, ChevronRight, Search } from 'lucide-react'
 
 export function SliderPanel() {
   const { data: rawItems = [], isLoading } = useSlider()
@@ -13,9 +13,14 @@ export function SliderPanel() {
   const remove = useDeleteSlider()
   const reorder = useReorderSlider()
   const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
 
-  // Always work on a stable sorted copy
   const items = [...rawItems].sort((a, b) => a.order_num - b.order_num)
+
+  const filtered = useMemo(() => {
+    const q = query.toLowerCase()
+    return items.filter(s => !q || s.title.toLowerCase().includes(q))
+  }, [items, query])
 
   const handleDelete = async (id: number) => {
     if (!confirm('Delete this slide?')) return
@@ -85,6 +90,16 @@ export function SliderPanel() {
         </Dialog>
       </div>
 
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search by name…"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+
       {isLoading ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           {[...Array(3)].map((_, i) => (
@@ -99,19 +114,24 @@ export function SliderPanel() {
         </div>
       ) : (
         <>
-          {items.length > 1 && (
+          {items.length > 1 && !query && (
             <p className="text-xs text-muted-foreground">
               Use the ← → buttons on each slide to change the display order.
             </p>
           )}
+          {filtered.length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted-foreground">No banners match "{query}"</p>
+          ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            {items.map((s, index) => (
+            {filtered.map((s) => {
+              const realIndex = items.findIndex(x => x.id === s.id)
+              return (
               <div key={s.id} className="group overflow-hidden rounded-xl border bg-card shadow-sm">
                 {s.image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={s.image_url}
-                    alt={`Slide ${index + 1}`}
+                    alt={s.title || `Slide ${realIndex + 1}`}
                     className="aspect-video w-full object-cover"
                   />
                 ) : (
@@ -119,23 +139,27 @@ export function SliderPanel() {
                     <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
                   </div>
                 )}
+                {s.title && (
+                  <div className="px-2 pt-1.5">
+                    <p className="truncate text-xs font-medium">{s.title}</p>
+                  </div>
+                )}
                 <div className="flex items-center justify-between border-t px-2 py-1.5">
-                  {/* Reorder arrows */}
                   <div className="flex items-center gap-0.5">
                     <button
-                      onClick={() => handleMove(index, 'left')}
-                      disabled={index === 0 || reorder.isPending}
+                      onClick={() => handleMove(realIndex, 'left')}
+                      disabled={realIndex === 0 || reorder.isPending}
                       className="rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30"
                       title="Move left"
                     >
                       <ChevronLeft className="h-3.5 w-3.5" />
                     </button>
                     <span className="min-w-[1.5rem] text-center text-xs text-muted-foreground">
-                      {index + 1}
+                      {realIndex + 1}
                     </span>
                     <button
-                      onClick={() => handleMove(index, 'right')}
-                      disabled={index === items.length - 1 || reorder.isPending}
+                      onClick={() => handleMove(realIndex, 'right')}
+                      disabled={realIndex === items.length - 1 || reorder.isPending}
                       className="rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30"
                       title="Move right"
                     >
@@ -151,8 +175,10 @@ export function SliderPanel() {
                   </button>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
+          )}
         </>
       )}
     </div>
