@@ -105,8 +105,8 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
         </Button>
       </div>
 
-      {/* Search + Sort — only show when there are selected items */}
-      {!isLoading && selected.length > 0 && multiple && (
+      {/* Search + Sort — always visible when multiple=true */}
+      {multiple && (
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
