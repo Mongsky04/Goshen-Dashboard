@@ -1,5 +1,6 @@
-import { NavLink } from 'react-router-dom'
-import { Package, MonitorPlay, Mic2, Home, LayoutGrid, Image } from 'lucide-react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@/store/authStore'
+import { Package, MonitorPlay, Mic2, Home, LayoutGrid, Image, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const CATALOG_ITEMS = [
@@ -41,6 +42,9 @@ function NavSection({ title, items }: { title: string; items: { to: string; labe
 }
 
 export function Sidebar() {
+  const logout = useAuthStore((s) => s.logout)
+  const navigate = useNavigate()
+
   return (
     <aside className="flex h-screen w-56 flex-col border-r bg-card">
       <div className="flex h-14 items-center gap-2.5 border-b px-4">
@@ -70,6 +74,16 @@ export function Sidebar() {
         <NavSection title="Catalog" items={CATALOG_ITEMS} />
         <NavSection title="Pages" items={PAGE_ITEMS} />
       </nav>
+
+      <div className="border-t p-2">
+        <button
+          onClick={() => { logout(); navigate('/login', { replace: true }) }}
+          className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
+          Logout
+        </button>
+      </div>
     </aside>
   )
 }
