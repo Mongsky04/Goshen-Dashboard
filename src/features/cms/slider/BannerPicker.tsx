@@ -5,8 +5,11 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { Check, ImageIcon, Plus, Search, X } from 'lucide-react'
+import type { Slider } from './useSlider'
 
 type SortKey = 'newest' | 'oldest' | 'az' | 'za'
+
+const EMPTY_BANNERS: Slider[] = []
 
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'newest', label: 'Newest' },
@@ -24,7 +27,7 @@ interface Props {
 
 export function BannerPicker({ slug, multiple = true, title = 'Banners', description }: Props) {
   const { data: all = [], isLoading: allLoading } = useAllBanners()
-  const { data: current = [], isLoading: currentLoading } = usePageBanners(slug)
+  const { data: current, isLoading: currentLoading } = usePageBanners(slug)
   const replace = useReplacePageBanners(slug)
 
   const [selected, setSelected] = useState<number[]>([])
@@ -34,9 +37,11 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
   const [listQuery, setListQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('newest')
 
+  const currentBanners = current ?? EMPTY_BANNERS
+
   useEffect(() => {
-    setSelected(current.map(b => b.id))
-  }, [current])
+    setSelected(currentBanners.map(b => b.id))
+  }, [currentBanners])
 
   const openDialog = () => {
     setDraft(selected)
@@ -151,7 +156,7 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
               </tr>
             </thead>
           </table>
-          <div className="max-h-[640px] overflow-y-auto">
+          <div className="max-h-160 overflow-y-auto">
             <table className="w-full text-sm">
               <tbody>
                 {selectedItems.length === 0 ? (
@@ -164,9 +169,9 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
                   <tr key={b.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                     <td className="px-4 py-3 text-xs text-muted-foreground w-12">{i + 1}</td>
                     <td className="px-4 py-3 w-20">
-                      {b.image_url ? (
+                      {b.imageUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={b.image_url} alt={b.title || `Banner ${i + 1}`} className="h-10 w-16 rounded-md object-cover" />
+                        <img src={b.imageUrl} alt={b.title || `Banner ${i + 1}`} className="h-10 w-16 rounded-md object-cover" />
                       ) : (
                         <div className="flex h-10 w-16 items-center justify-center rounded-md bg-muted">
                           <ImageIcon className="h-4 w-4 text-muted-foreground/40" />
@@ -220,9 +225,9 @@ export function BannerPicker({ slug, multiple = true, title = 'Banners', descrip
                         isSelected ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-muted-foreground'
                       }`}
                     >
-                      {b.image_url ? (
+                      {b.imageUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={b.image_url} alt={b.title} className="aspect-video w-full object-cover" />
+                        <img src={b.imageUrl} alt={b.title} className="aspect-video w-full object-cover" />
                       ) : (
                         <div className="flex aspect-video items-center justify-center bg-muted">
                           <ImageIcon className="h-6 w-6 text-muted-foreground/40" />

@@ -17,7 +17,7 @@ export function HomepagePanel() {
   const [query, setQuery] = useState('')
 
   useEffect(() => {
-    setSelected(grid.map(g => g.product_id))
+    setSelected(grid.map(g => g.productId))
   }, [grid])
 
   const openDialog = () => {
@@ -90,9 +90,9 @@ export function HomepagePanel() {
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5">
           {selectedItems.map(p => (
             <div key={p.id} className="group relative overflow-hidden rounded-xl border border-primary ring-1 ring-primary">
-              {p.image_url ? (
+              {p.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.image_url} alt={p.name} className="aspect-square w-full object-cover" />
+                <img src={p.imageUrl} alt={p.name} className="aspect-square w-full object-cover" />
               ) : (
                 <div className="flex aspect-square items-center justify-center bg-muted">
                   <span className="text-xs text-muted-foreground">No img</span>
@@ -138,9 +138,9 @@ export function HomepagePanel() {
                         isSelected ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-muted-foreground'
                       }`}
                     >
-                      {p.image_url ? (
+                      {p.imageUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={p.image_url} alt={p.name} className="aspect-square w-full object-cover" />
+                        <img src={p.imageUrl} alt={p.name} className="aspect-square w-full object-cover" />
                       ) : (
                         <div className="flex aspect-square items-center justify-center bg-muted">
                           <span className="text-xs text-muted-foreground">No img</span>

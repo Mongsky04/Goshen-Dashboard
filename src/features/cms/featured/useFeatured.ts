@@ -3,16 +3,21 @@ import { api } from '@/api/client'
 
 export interface Featured {
   id: number
-  product_id: number
+  productId: number
   name: string
-  image_url: string
+  imageUrl: string
   category: string
-  sub_category: string
-  featured_categories: string[]
-  created_at: string
+  subCategory: string
+  featuredCategories: string[]
+  createdAt: string
 }
 
 interface ApiPaged<T> { success: boolean; data: { data: T[]; page: number; limit: number; total: number | null } }
+
+export interface CreateFeaturedInput {
+  product_id: number
+  featured_categories: string[]
+}
 
 export function useFeatured() {
   return useQuery({
@@ -24,7 +29,7 @@ export function useFeatured() {
 export function useCreateFeatured() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (form: FormData) => api.upload('/api/v1/featured', form),
+    mutationFn: (body: CreateFeaturedInput) => api.post('/api/v1/featured', body),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['featured'] }),
   })
 }

@@ -142,7 +142,7 @@ export function ArticlesPanel() {
                 </tr>
               </thead>
             </table>
-            <div className="max-h-[640px] overflow-y-auto">
+            <div className="max-h-160 overflow-y-auto">
               <table className="w-full text-sm">
                 <tbody>
                   {filtered.length === 0 ? (
@@ -155,9 +155,9 @@ export function ArticlesPanel() {
                     <tr key={a.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-3 text-xs text-muted-foreground w-12">{i + 1}</td>
                       <td className="px-4 py-3 w-20">
-                        {a.image_url ? (
+                        {a.imageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={a.image_url} alt={a.title} className="h-9 w-14 rounded-md object-cover" />
+                          <img src={a.imageUrl} alt={a.title} className="h-9 w-14 rounded-md object-cover" />
                         ) : (
                           <div className="h-9 w-14 rounded-md bg-muted" />
                         )}
@@ -169,7 +169,7 @@ export function ArticlesPanel() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs text-muted-foreground w-36">
-                        {new Date(a.published_at).toLocaleDateString('en-GB', {
+                        {new Date(a.publishedAt).toLocaleDateString('en-GB', {
                           day: 'numeric', month: 'short', year: 'numeric',
                         })}
                       </td>

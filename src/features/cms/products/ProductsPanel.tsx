@@ -32,7 +32,7 @@ export function ProductsPanel() {
       !q ||
       p.name.toLowerCase().includes(q) ||
       p.category.toLowerCase().includes(q) ||
-      p.sub_category.toLowerCase().includes(q)
+      p.subCategory.toLowerCase().includes(q)
     )
 
     switch (sort) {
@@ -142,7 +142,7 @@ export function ProductsPanel() {
                 </tr>
               </thead>
             </table>
-            <div className="max-h-[640px] overflow-y-auto">
+            <div className="max-h-160 overflow-y-auto">
               <table className="w-full text-sm">
                 <tbody>
                   {filtered.length === 0 ? (
@@ -155,16 +155,16 @@ export function ProductsPanel() {
                     <tr key={p.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-3 text-xs text-muted-foreground w-12">{p.id}</td>
                       <td className="px-4 py-3 w-16">
-                        {p.image_url ? (
+                        {p.imageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.image_url} alt={p.name} className="h-9 w-9 rounded-lg object-cover" />
+                          <img src={p.imageUrl} alt={p.name} className="h-9 w-9 rounded-lg object-cover" />
                         ) : (
                           <div className="h-9 w-9 rounded-lg bg-muted" />
                         )}
                       </td>
                       <td className="px-4 py-3 font-medium text-foreground">{p.name}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{p.category}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">{p.sub_category}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{p.subCategory}</td>
                       <td className="px-4 py-3 w-12">
                         <button
                           onClick={() => handleDelete(p.id)}

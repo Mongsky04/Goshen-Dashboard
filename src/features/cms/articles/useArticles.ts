@@ -5,9 +5,9 @@ export interface Article {
   id: number
   title: string
   description: string
-  image_url: string
-  published_at: string
-  created_at: string
+  imageUrl: string
+  publishedAt: string
+  createdAt: string
 }
 
 interface ApiPaged<T> { success: boolean; data: { data: T[]; page: number; limit: number; total: number | null } }

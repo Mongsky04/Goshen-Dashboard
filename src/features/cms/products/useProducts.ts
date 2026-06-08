@@ -4,10 +4,10 @@ import { api } from '@/api/client'
 export interface Product {
   id: number
   name: string
-  image_url: string
+  imageUrl: string
   category: string
-  sub_category: string
-  created_at: string
+  subCategory: string
+  createdAt: string
 }
 
 interface ApiPaged<T> { success: boolean; data: { data: T[]; page: number; limit: number; total: number | null } }

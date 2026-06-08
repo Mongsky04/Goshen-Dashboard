@@ -4,11 +4,11 @@ import type { Product } from '../products/useProducts'
 
 export interface GridProduct {
   id: number
-  product_id: number
+  productId: number
   name: string
-  image_url: string
+  imageUrl: string
   category: string
-  sub_category: string
+  subCategory: string
 }
 
 interface ApiList<T> { success: boolean; data: T[] }

@@ -136,16 +136,16 @@ export function SliderPanel() {
                 </tr>
               </thead>
             </table>
-            <div className="max-h-[640px] overflow-y-auto">
+            <div className="max-h-160 overflow-y-auto">
               <table className="w-full text-sm">
                 <tbody>
                   {filtered.map((s, i) => (
                     <tr key={s.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-3 text-muted-foreground w-12">{i + 1}</td>
                       <td className="px-4 py-3 w-20">
-                        {s.image_url ? (
+                        {s.imageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={s.image_url} alt={s.title} className="h-10 w-16 rounded-md object-cover" />
+                          <img src={s.imageUrl} alt={s.title} className="h-10 w-16 rounded-md object-cover" />
                         ) : (
                           <div className="flex h-10 w-16 items-center justify-center rounded-md bg-muted">
                             <ImageIcon className="h-4 w-4 text-muted-foreground/40" />

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/api/client'
 
-export interface Slider { id: number; title: string; image_url: string; order_num: number; created_at: string }
+export interface Slider { id: number; title: string; imageUrl: string; orderNum: number; createdAt: string }
 interface ApiList<T> { success: boolean; data: T[] }
 
 export function useSlider() {
